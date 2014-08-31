@@ -4,7 +4,9 @@
  */
 package webmaker;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -25,17 +27,26 @@ public class GUI implements ActionListener{
     public void build(){
         
         form.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        form.setSize(500, 50);
-        form.setVisible(true);
+        form.setSize(500, 500);
         c = new Canvas();
+        c.addMouseListener(c);
         c.setBackground(Color.BLACK);
         c.setForeground(Color.WHITE);
-        form.setExtendedState(form.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+        form.setLayout(new BorderLayout());
+        form.add(c, BorderLayout.CENTER);
+        form.setVisible(true);
+        //form.setExtendedState(form.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+        form.validate();
         //c.addNode("","LOG14295", 3,1,0,200);
-        ConnectedNetwork(200, 0,1);
-        //testGenerate(50);
+        //c.addNode("","",1000,1,(int)form.getContentPane().getWidth()/2,(int)form.getContentPane().getHeight()/2);
+        //c.addNode("","",100,1,(int)form.getWidth()/2,(int)form.getHeight()/2 - 50);
+        
+          
+        //ConnectedNetwork(200, 0,0);
+        //testGenerate(100);
         //testGenerate(500,1409365155033l);
-        form.add(c);
+        
+       
         t.start();
         
         
@@ -65,7 +76,7 @@ public class GUI implements ActionListener{
             for (int k = 0; k < ret.length; k++) {
                 ret[k] = t.get(k).intValue();
             }
-            c.addNode("","",(double)(rand.nextFloat()*100),(double)(rand.nextFloat()*10),
+            c.addNode("","",(double)(rand.nextFloat()*100 + 5),(double)(rand.nextFloat()*10),
                     (int)(rand.nextFloat()*form.getWidth()),(int)(rand.nextFloat()*form.getHeight()),ret
                     );
         }
@@ -98,7 +109,7 @@ public void ConnectedNetwork(int blots, int connects, int maxconnects, long seed
          ConnectedNetwork(blots,connectsmin,connectsmax, System.currentTimeMillis());
     }
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent e) {      
         c.repaint();    
     }
 }

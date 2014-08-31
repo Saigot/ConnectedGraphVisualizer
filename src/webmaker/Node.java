@@ -25,13 +25,16 @@ public class Node {
     double tension;
     double x;
     double y;
-    Boolean expanded;
-    boolean allowOutside = false;
+    boolean expanded;
+    private boolean selected = false;
+            
     static double centerX = 250;
     static double centerY = 250;
     static double centralTendency = 10;
-    static double FORCE_CAP = 80;
+    static double forceCap = 80;
     static double ColourScale = 1;
+    static int maxRenderSize = 100;
+    static int minRenderSize = 5;
     public Node(int i, String n, String d, double mag, double tens, int X, int Y, int... l) {
         x = X;
         y = Y;
@@ -51,24 +54,29 @@ public class Node {
         FindForce(gl);
         Color c = g.getColor();
         move();
-        double size = Math.min(Math.max(magnitude / 4, 10), 100);
-        g.fillOval((int) (x - size / 2), (int) (y - size / 2), (int) size, (int) size);
-        g.setColor(c);
-        if (links.isEmpty()) {
-            return;
+        double size = getSize();
+        if(selected){
+            double r = 1.5;
+            g.setColor(new Color(255, (int)(255-tension*25),(int)(255-tension*25),(int)(255*0.7)));
+            g.fillOval((int) (x - (size*r/2)), (int) (y - (size*r/2)),(int) (size*r), (int) (size*r));
         }
-        for (Node n : gl) {
-            if (isLinked(n.index)) {
-                double dx = n.x - x;
-                double dy = n.y - y;
-                double distance = (double) Math.sqrt(dx*dx+dy*dy);
-                double tens = Math.abs((n.getTension(distance)) + getTension(distance) * ColourScale);
-                g.setColor(new Color(255,(int)Math.max(255-tens,0),(int)Math.max(255-tens,0)));
-                g.drawLine((int) x, (int) y, (int) n.x, (int) n.y);
-                //System.out.println((int)x + "," + (int)y + "," + (int)n.x + "," + (int)n.y);
-            }
+        g.setColor(new Color(255, (int)(255-tension*25),(int)(255-tension*25)));
+        g.fillOval((int) (x - (size/2)), (int) (y - (size/2)),(int) size, (int) size);
+        if (!links.isEmpty()) {
+            for (Node n : gl) {
+                if (isLinked(n.index)) {
+                    double dx = n.x - x;
+                    double dy = n.y - y;
+                    double distance = (double) Math.sqrt(dx * dx + dy * dy);
+                    double tens = Math.abs((n.getTension(distance)) + getTension(distance) * ColourScale);
+                    g.setColor(new Color(255, (int) Math.max(255 - tens, 0), (int) Math.max(255 - tens, 0)));
+                    g.drawLine((int) x, (int) y, (int) n.x, (int) n.y);
+                    //System.out.println((int)x + "," + (int)y + "," + (int)n.x + "," + (int)n.y);
+                }
 
+            }
         }
+        
         g.setColor(c);
     }
 
@@ -98,6 +106,7 @@ public class Node {
         double distance = (double) (Math.sqrt((centerX - x)*(centerX - x)+(centerY - y)*(centerY - y)));
         double netForcem = (double) (centralTendency * Math.expm1(distance 
                 / Math.sqrt(centerX*centerX+centerY*centerY)));
+        distance = distance <= 0.000001? 0.000001:distance;
         netForcex += (centerX - x) * netForcem / distance;
         netForcey += (centerY - y) * netForcem / distance;
         //netForcex+=(((Math.exp(centerX - x))*centralTendency)/Math.exp(centerX));
@@ -109,8 +118,8 @@ public class Node {
     public void move() {
         double oldx = x;
         double oldy = y;
-        netForcex = Math.min(Math.abs(netForcex), FORCE_CAP)*Math.signum(netForcex);
-        netForcey = Math.min(Math.abs(netForcey), FORCE_CAP)*Math.signum(netForcey);
+        netForcex = Math.min(Math.abs(netForcex), forceCap)*Math.signum(netForcex);
+        netForcey = Math.min(Math.abs(netForcey), forceCap)*Math.signum(netForcey);
         x += netForcex / magnitude;
         y += netForcey / magnitude;
 
@@ -140,11 +149,32 @@ public class Node {
         }
         return !(links.indexOf(index) == -1);
     }
+    
+    private double getSize(){
+        return Math.min(Math.max(magnitude / 4, minRenderSize), maxRenderSize);
+    }
 
     public double getTension(double distance) {
         return tension * distance / 20;
     }
-
+    public boolean isClicked(int X, int Y){
+        return (Math.abs(x-X) < getSize()/2 && Math.abs(y-Y) < getSize()/2);
+    }
+    
+    public void link(int i){
+        if(!isLinked(i)){
+            links.add(new Integer(i));
+        }
+    }
+    public void toggleSelect(){
+        selected = !selected;
+    }
+    public void unSelect(){
+        selected = false;
+    }
+    public void Select(){
+        selected = true;
+    }
     public double getMagnitude(double distance) {
         distance = distance * distance <= 0.00001f ? 0.00001f : distance; //prevents infiniity problems
         //squaring makes the distance stuff more realistic
