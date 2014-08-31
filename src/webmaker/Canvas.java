@@ -36,6 +36,9 @@ public class Canvas extends JPanel implements MouseListener{
         gl.add(new Node(gl.size(),name,desc,mag,ten,x,y,links));
     }
 
+    public Node getSelected(){
+        return selected;
+    }
     @Override
     public void mouseClicked(MouseEvent e) {
        

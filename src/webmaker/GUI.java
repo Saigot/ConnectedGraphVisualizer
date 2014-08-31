@@ -43,7 +43,7 @@ public class GUI implements ActionListener{
         
           
         //ConnectedNetwork(200, 0,0);
-        //testGenerate(100);
+        testGenerate(100);
         //testGenerate(500,1409365155033l);
         
        

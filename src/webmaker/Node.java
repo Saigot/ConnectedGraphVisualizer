@@ -30,7 +30,7 @@ public class Node {
             
     static double centerX = 250;
     static double centerY = 250;
-    static double centralTendency = 10;
+    static double centralTendency = 1;
     static double forceCap = 80;
     static double ColourScale = 1;
     static int maxRenderSize = 100;
@@ -107,8 +107,8 @@ public class Node {
         double netForcem = (double) (centralTendency * Math.expm1(distance 
                 / Math.sqrt(centerX*centerX+centerY*centerY)));
         distance = distance <= 0.000001? 0.000001:distance;
-        netForcex += (centerX - x) * netForcem / distance;
-        netForcey += (centerY - y) * netForcem / distance;
+        netForcex += (centerX - x) * netForcem / distance * magnitude;
+        netForcey += (centerY - y) * netForcem / distance * magnitude;
         //netForcex+=(((Math.exp(centerX - x))*centralTendency)/Math.exp(centerX));
         //netForcex += (((centerX*centerX - x*x)*centralTendency)/(centerX*centerX)); 
         //netForcey += (((centerY*centerY - y*y)*centralTendency)/(centerY*centerY));
